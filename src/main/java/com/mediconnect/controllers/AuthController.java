@@ -1,5 +1,4 @@
 package com.mediconnect.controllers;
-
 import com.mediconnect.dtos.LoginResponse;
 import com.mediconnect.dtos.UserResponseDTO;
 import com.mediconnect.model.User;
