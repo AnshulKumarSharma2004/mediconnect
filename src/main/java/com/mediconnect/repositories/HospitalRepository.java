@@ -14,4 +14,6 @@ public interface HospitalRepository extends MongoRepository<Hospital, ObjectId> 
 
     List<Hospital> findTop10ByOrderByRatingDesc();
 
+
+    Optional<Hospital> findByEmailAndRegistrationNumber(String email, String regNo);
 }

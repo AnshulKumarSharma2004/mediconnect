@@ -1,4 +1,5 @@
 package com.mediconnect.controllers;
+import com.mediconnect.dtos.HospitalLoginRequestDTO;
 import com.mediconnect.dtos.HospitalResponseDTO;
 import com.mediconnect.model.Hospital;
 import com.mediconnect.model.User;
@@ -64,6 +65,22 @@ public class HospitalController {
 
         hospitalService.deleteHospitalById(hospitalId, user.getId().toString());
         return ResponseEntity.ok("Hospital and its images deleted successfully");
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<HospitalResponseDTO> hospitalLogin(
+            Authentication auth,
+            @RequestBody HospitalLoginRequestDTO loginRequest) {
+
+        String email = auth.getName();
+        User admin = userRepository.findByEmail(email)
+                .orElseThrow(()-> new RuntimeException("Admin Not Found"));
+        String hospitalEmail = loginRequest.getEmail();
+        String regNo = loginRequest.getRegistrationNumber();
+
+        HospitalResponseDTO hospital = hospitalService.authenticateHospital(admin.getId().toString(),hospitalEmail,regNo);
+
+        return ResponseEntity.ok(hospital);
     }
 
 }

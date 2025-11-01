@@ -183,4 +183,15 @@ public class HospitalService {
                 .collect(Collectors.toList());
     }
 
+    public HospitalResponseDTO authenticateHospital(String adminId,String email, String regNo) {
+
+        Hospital hospital = hospitalRepository.findByEmailAndRegistrationNumber(email, regNo)
+                .orElseThrow(() -> new RuntimeException("Hospital email or registration number invalid"));
+
+        if(!hospital.getAdminId().equals(adminId)){
+            throw new RuntimeException("Unauthorized: Hospital does not belong to this admin");
+        }
+        return convertToDTO(hospital);
+    }
+
 }
