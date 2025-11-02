@@ -22,6 +22,8 @@ public class JWTUtil {
             @Value("${jwt.expiration}") long expirationTime) {
         this.SECRET_KEY = Keys.hmacShaKeyFor(secret.getBytes());
         this.EXPIRATION_TIME = expirationTime;
+        System.out.println("JWTUtil initialized with expiration(ms): " + EXPIRATION_TIME);
+
     }
 
 
@@ -31,10 +33,23 @@ public class JWTUtil {
         claims.put("name", name);
         claims.put("role", role);
 
-        return createToken(claims, email);
+        String token = createToken(claims, email);
+        System.out.println("Generated JWT for " + email);
+        System.out.println("Token: " + token);
+
+        Claims decodedClaims = extractAllClaims(token);
+        System.out.println("Token issued at: " + decodedClaims.getIssuedAt());
+        System.out.println("Token expires at: " + decodedClaims.getExpiration());
+
+        return token;
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
+        Date now = new Date(System.currentTimeMillis());
+        Date expiryDate = new Date(System.currentTimeMillis() + EXPIRATION_TIME);
+
+        System.out.println("Creating token at: " + now);
+        System.out.println("Token will expire at: " + expiryDate);
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
@@ -45,11 +60,13 @@ public class JWTUtil {
     }
 
     public Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder()
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+        System.out.println("Extracted claims from token: " + claims);
+        return claims;
     }
     public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();
@@ -58,6 +75,10 @@ public class JWTUtil {
         return extractAllClaims(token).get("role", String.class);
     }
     public boolean isTokenExpired(String token) {
-        return extractAllClaims(token).getExpiration().before(new Date());
+
+        Date expiration = extractAllClaims(token).getExpiration();
+        boolean expired = expiration.before(new Date());
+        System.out.println("Checking token expiration: " + expiration + " | Expired? " + expired);
+        return expired;
     }
 }
