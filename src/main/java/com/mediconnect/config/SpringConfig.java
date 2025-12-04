@@ -30,6 +30,8 @@ public class SpringConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("HOSPITAL_ADMIN")
                         .requestMatchers("api/user/**").hasRole("PATIENT")
+                        .requestMatchers("api/doctors/**").hasRole("DOCTOR")
+                        .requestMatchers("/ws-chat/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

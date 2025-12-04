@@ -164,6 +164,8 @@ public class HospitalService {
                 .images(hospital.getImages())
                 .rating(hospital.getRating())
                 .upiId(hospital.getUpiId())
+                .latitude(hospital.getLatitude())
+                .longitude(hospital.getLongitude())
                 .build();
     }
 

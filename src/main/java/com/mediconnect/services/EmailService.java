@@ -73,7 +73,7 @@ public class EmailService {
         message.setTo(toEmail);
         message.setSubject("Welcome to "+hospitalName + " | MediConnect Doctor Access");
         message.setText(
-                "Hello Dr. " + doctorName + ",\n\n" +
+                "Hello  " + doctorName + ",\n\n" +
                         "You have been added as a doctor in " + hospitalName + " via MediConnect.\n\n" +
                         "Your temporary login credentials are:\n" +
                         "Email: " + toEmail + "\n" +

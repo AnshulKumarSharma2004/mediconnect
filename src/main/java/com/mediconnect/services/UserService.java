@@ -2,15 +2,23 @@ package com.mediconnect.services;
 
 import com.mediconnect.dtos.UpdateDTO;
 import com.mediconnect.dtos.UserResponseDTO;
+import com.mediconnect.model.Doctor;
 import com.mediconnect.model.User;
+import com.mediconnect.repositories.DoctorRepository;
 import com.mediconnect.repositories.UserRepository;
 import com.mediconnect.utilities.JWTUtil;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
+
+    @Autowired
+    private DoctorRepository doctorRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -74,7 +82,49 @@ public class UserService {
         if(updateDTO.getPhoneNo() != null) user.setPhoneNo(updateDTO.getPhoneNo());
 
         userRepository.save(user);
+        Doctor doctor = doctorRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        if(updateDTO.getName() != null) doctor.setName(updateDTO.getName());
+        if(updateDTO.getPhoneNo() != null) doctor.setPhoneNumber(updateDTO.getPhoneNo());
+
+        doctorRepository.save(doctor);
         return convertToDto(user);
     }
+    public boolean changePassword(String email, String oldPassword, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            return false;
+        }
+
+        String encodedPassword = passwordEncoder.encode(newPassword);
+
+
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+
+        Doctor doctor = doctorRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
+
+        doctor.setPassword(encodedPassword);
+        doctorRepository.save(doctor);
+
+        return true;
+    }
+    public UserResponseDTO getUserById(String userId) {
+        ObjectId id = new ObjectId(userId);
+        Optional<User> optionalUser = userRepository.findById(id);
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            return convertToDto(user);
+        } else {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+    }
+
+
 
 }

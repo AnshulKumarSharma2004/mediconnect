@@ -48,4 +48,6 @@ public class HospitalResponseDTO {
 
 
     private String upiId;
+    private double latitude;
+    private double longitude;
 }

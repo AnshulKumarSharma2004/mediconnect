@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface ChatMessageRepository extends MongoRepository<ChatMessage,ObjectId> {
     List<ChatMessage> findByRoomIdOrderByTimestampAsc(String roomId);
+    List<ChatMessage> findBySenderIdOrReceiverId(String senderId, String receiverId);
+    List<ChatMessage> findDistinctByRoomIdAndSenderIdOrReceiverId(String roomId, String senderId, String receiverId);
 }

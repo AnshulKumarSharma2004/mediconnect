@@ -3,8 +3,10 @@ package com.mediconnect.services;
 import com.mediconnect.dtos.DoctorResponseDTO;
 import com.mediconnect.model.Doctor;
 import com.mediconnect.model.Hospital;
+import com.mediconnect.model.User;
 import com.mediconnect.repositories.DoctorRepository;
 import com.mediconnect.repositories.HospitalRepository;
+import com.mediconnect.repositories.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +18,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class DoctorService {
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private DoctorRepository doctorRepository;
@@ -54,6 +59,17 @@ public class DoctorService {
             savedDoctor.setImageUrl(imageUploadService.uploadImage(image, folderName));
             savedDoctor = doctorRepository.save(savedDoctor);
         }
+        User doctorUser = User.builder()
+                .id(savedDoctor.getId())
+                .name(savedDoctor.getName())
+                .email(savedDoctor.getEmail())
+                .password(savedDoctor.getPassword())
+                .phoneNo(savedDoctor.getPhoneNumber())
+                .verified(true)
+                .role("DOCTOR")
+                .build();
+
+        userRepository.save(doctorUser);
 
         // Send credentials email
         emailService.sendDoctorCredentialsEmail(
